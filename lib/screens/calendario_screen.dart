@@ -71,7 +71,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
       // Muestra el título según la pestaña activa
       appBar: AppBar(
         title: Text(
-          _indiceActual == 0 ? 'CURSO ALDO PARISOT' : 'INFORMACIÓN',
+          _indiceActual == 0 ? 'CALENDARIO' : 'INFORMACIÓN',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: Theme.of(context).colorScheme.tertiary,
             letterSpacing: 2.0,
