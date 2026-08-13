@@ -1,11 +1,11 @@
 {
-  "name": "Curso Violonchelo Bqto",
-  "short_name": "Curso Vcl",
+  "name": "Curso de violonchelo Duo Aldo Parisot",
+  "short_name": "Curso DAP",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
-  "description": "Cronograma e información del Curso de Violonchelo Barquisimeto",
+  "description": "Cronograma e información del Curso de violonchelo Duo Aldo Parisot",
   "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "icons": [
