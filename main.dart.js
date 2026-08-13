@@ -44895,7 +44895,7 @@ ak(){return A.aV8()}}
 A.So.prototype={
 aD(){this.aT()
 this.w=this.d.no()},
-L(a){var s,r,q,p,o=this,n=null,m=o.x===0?"CURSO ALDO PARISOT":"INFORMACI\xd3N",l=A.K(a).ok.r
+L(a){var s,r,q,p,o=this,n=null,m=o.x===0?"CALENDARIO":"INFORMACI\xd3N",l=A.K(a).ok.r
 if(l==null)l=n
 else{s=A.K(a).ax
 r=s.CW
