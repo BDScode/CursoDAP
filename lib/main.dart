@@ -20,7 +20,7 @@ class CursoBqtoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Curso Violonchelo BQTO',
+      title: 'Curso violonchelo Duo Aldo Parisot',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData(
