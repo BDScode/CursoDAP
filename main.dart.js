@@ -44890,7 +44890,7 @@ A.aeg.prototype={}
 A.ak_.prototype={}
 A.KX.prototype={
 L(a){var s=null,r=A.aSh(A.nN(s,s,B.af,s,s,s,s,s).ok.amS(B.k,B.k)).aph(A.mh().$2$color$fontWeight(B.k,B.aA),A.mh().$2$color$fontWeight(B.k,B.aA),A.mh().$2$color$fontWeight(B.k,B.aA),A.mh().$2$color$fontWeight(B.k,B.aA),A.mh().$2$color$fontWeight(B.k,B.aA),A.mh().$2$color$fontWeight(B.k,B.aA),A.mh().$2$color$fontWeight(B.k,B.bz),A.mh().$2$color$fontWeight(B.k,B.bz),A.mh().$2$color$fontWeight(B.k,B.bz))
-return new A.AI(B.Dz,"Curso Violonchelo BQTO",A.nN(A.aDA(B.nm,!0,s,s,0,A.mh().$4$color$fontSize$fontWeight$letterSpacing(B.k,22,B.aA,1.2)),B.BS,B.af,B.ns,new A.oY(B.af,B.EF,B.k,s,s,s,s,s,s,B.En,B.k,s,s,s,s,s,s,B.nt,B.k,s,s,s,s,s,s,B.Ey,B.l,s,s,B.Eh,B.k,s,s,s,s,s,s,s,B.ns,s,s,s,s,s,s,s,s,s,B.DT,B.k),B.nm,r,!0),B.AG,!1,s)}}
+return new A.AI(B.Dz,"Curso violonchelo Duo Aldo Parisot",A.nN(A.aDA(B.nm,!0,s,s,0,A.mh().$4$color$fontSize$fontWeight$letterSpacing(B.k,22,B.aA,1.2)),B.BS,B.af,B.ns,new A.oY(B.af,B.EF,B.k,s,s,s,s,s,s,B.En,B.k,s,s,s,s,s,s,B.nt,B.k,s,s,s,s,s,s,B.Ey,B.l,s,s,B.Eh,B.k,s,s,s,s,s,s,s,B.ns,s,s,s,s,s,s,s,s,s,B.DT,B.k),B.nm,r,!0),B.AG,!1,s)}}
 A.ym.prototype={
 ak(){return A.aV8()}}
 A.So.prototype={
