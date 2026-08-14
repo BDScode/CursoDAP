@@ -295,6 +295,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
             children: [
               Expanded(
                 child: DropdownMenu<String>(
+                  key: ValueKey(_idAlumnoSeleccionado),
                   initialSelection: _idAlumnoSeleccionado,
                   hintText: "Alumnos",
                   enableSearch: true,
@@ -383,6 +384,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: DropdownMenu<String>(
+                  key: ValueKey(_profesorSeleccionado),
                   initialSelection: _profesorSeleccionado,
                   hintText: "Profesores",
                   enableSearch: true,
