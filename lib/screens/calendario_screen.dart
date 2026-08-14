@@ -303,7 +303,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                   leadingIcon: const Icon(Icons.search, size: 20),
                   trailingIcon: Icon(
                     Icons.keyboard_arrow_down,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.tertiary,
                   ),
                   selectedTrailingIcon: Icon(
                     Icons.keyboard_arrow_up,
@@ -391,7 +391,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                   leadingIcon: const Icon(Icons.school_outlined, size: 20),
                   trailingIcon: Icon(
                     Icons.keyboard_arrow_down,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.tertiary,
                   ),
                   selectedTrailingIcon: Icon(
                     Icons.keyboard_arrow_up,
@@ -555,7 +555,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
             child: bloquesHorarios.isEmpty
                 ? Center(
                     child: Text(
-                      'No hay actividades para este día',
+                      'No hay actividades programadas',
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                   )
@@ -1189,7 +1189,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                       ),
                     ),
                     Text(
-                      '${bloque['Inicio']} — ${bloque['Fin']}',
+                      bloque['Inicio'] ?? '--:--',
                       style: TextStyle(
                         color: Colors.grey.shade400,
                         fontWeight: FontWeight.w500,
@@ -1226,7 +1226,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            esClase ? Icons.person_outline : Icons.music_note,
+                            _obtenerIconoActividad(clase, esClase),
                             color: Theme.of(context).colorScheme.tertiary,
                             size: 20,
                           ),
@@ -1264,6 +1264,14 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                                   ),
                                 ),
                               ],
+                              // Hora de inicio y fin de cada actividad
+                              Text(
+                                '${_formatearHora(clase['Inicio'])} — ${_formatearHora(clase['Fin'])}',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -1409,11 +1417,14 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
         })
         .where((bloque) {
           // Filtramos bloques que no tengan ninguna actividad real
+          // y excluimos las actividades "Espacio disponible"
           final lista = bloque['listaClases'] as List<dynamic>;
           return lista.any((c) {
             final alu = c['Alumno']?.toString().trim() ?? '';
             final act = c['Tipo Actividad']?.toString().trim() ?? '';
-            return alu.isNotEmpty || act.isNotEmpty;
+            final esEspacioDisponible =
+                act.toLowerCase() == 'espacio disponible';
+            return (alu.isNotEmpty || act.isNotEmpty) && !esEspacioDisponible;
           });
         })
         .toList();
@@ -1697,6 +1708,40 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
     } catch (e) {
       return false;
     }
+  }
+
+  // --- ICONO SEGÚN TIPO DE ACTIVIDAD ---
+  // Asigna un icono representativo a cada tipo de actividad general
+  IconData _obtenerIconoActividad(Map<String, dynamic> clase, bool esClase) {
+    if (esClase) return Icons.person_outline;
+
+    final tipo = (clase['Tipo Actividad']?.toString() ?? '').toLowerCase();
+
+    if (tipo.contains('almuerzo') || tipo.contains('comida')) {
+      return Icons.restaurant;
+    }
+    if (tipo.contains('bienvenida') ||
+        tipo.contains('reunión') ||
+        tipo.contains('reunion')) {
+      return Icons.groups;
+    }
+    if (tipo.contains('ensayo') ||
+        tipo.contains('ensamble') ||
+        tipo.contains('ensemble')) {
+      return Icons.piano;
+    }
+    if (tipo.contains('concierto') || tipo.contains('presentación')) {
+      return Icons.mic_external_on;
+    }
+    if (tipo.contains('clase magistral') || tipo.contains('masterclass')) {
+      return Icons.school;
+    }
+    if (tipo.contains('descanso') || tipo.contains('break')) {
+      return Icons.free_breakfast;
+    }
+
+    // Icono por defecto para actividades generales
+    return Icons.event_note;
   }
 
   // --- COLOR DE LA FRANJA IZQUIERDA DE LA CARD ---

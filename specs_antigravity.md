@@ -1,4 +1,4 @@
-Plantilla Spec-First • Proyecto: Curso Bqto App
+Plantilla Spec-First • Proyecto: Curso Dúo Aldo Parisot
 
 Estructura tu proyecto antes de escribir una línea de código o prompt
 SECCIÓN 1 — Visión del producto
