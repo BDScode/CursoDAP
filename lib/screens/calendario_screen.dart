@@ -44,9 +44,9 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
   late Future<Map<String, dynamic>> _fetchFuture;
   int _indiceActual = 0;
 
-  // Configuración de fechas para el curso (21 al 31 de agosto de 2026)
+  // Configuración de fechas para el curso (21 al 30 de agosto de 2026)
   final Map<String, DateTime> _mapeoFechas = {
-    for (int i = 21; i <= 31; i++) 'Día $i': DateTime(2026, 8, i),
+    for (int i = 21; i <= 30; i++) 'Día $i': DateTime(2026, 8, i),
   };
 
   // Variable para simular la fecha y hora actual (para pruebas)
@@ -232,8 +232,8 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
       return nombreA.compareTo(nombreB);
     });
 
-    // Generar los días fijos del 21 al 31 de agosto
-    final setDias = List.generate(11, (index) => '${21 + index}');
+    // Generar los días fijos del 21 al 30 de agosto
+    final setDias = List.generate(10, (index) => '${21 + index}');
 
     // Seleccionar por defecto el día actual si está dentro del rango del curso
     if (_diaSeleccionado == null && setDias.isNotEmpty) {
@@ -246,19 +246,29 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
       }
     }
 
-    // Generar lista de profesores únicos
+    // Generar lista de profesores y pianistas únicos
     final setProfesores = <String>{};
     for (var clase in calendarioCurso) {
       final prof = clase['Profesor']?.toString().trim() ?? '';
       if (prof.isNotEmpty && prof != 'Todos lo profesores') {
         setProfesores.add(prof);
       }
+      // Agregar pianistas a la lista de profesores
+      final pianista = clase['Pianista']?.toString().trim() ?? '';
+      if (pianista.isNotEmpty) {
+        setProfesores.add(pianista);
+      }
     }
     final listaProfesores = setProfesores.toList()..sort();
 
-    // Lógica de filtrado de actividades
+    // ==========================================================
+    // LÓGICA DE FILTRADO DE ACTIVIDADES
+    // ==========================================================
     List<dynamic> filtrado = calendarioCurso;
 
+    // --- FILTRO POR ALUMNO ---
+    // Si se selecciona un alumno, muestra solo sus actividades
+    // o las generales (ALU-TODOS)
     if (_idAlumnoSeleccionado != null) {
       filtrado = filtrado.where((clase) {
         final id = clase['Alumno']?.toString().trim() ?? '';
@@ -266,18 +276,83 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
       }).toList();
     }
 
+    // ==========================================================
+    // FILTRO POR PROFESOR (incluye reglas especiales)
+    // ==========================================================
     if (_profesorSeleccionado != null) {
+      // ------------------------------------------------------
+      // REGLA 1: Profesores presenciales con días sin actividad
+      // ------------------------------------------------------
+      // Elizabeth Marichal, Beideth Briceño y Dennis Parker:
+      // si no tienen actividad ese día, NO se muestran actividades
+      // generales (almuerzo, etc.)
+      final profesoresSinDiaLibre = [
+        'Elizabeth Marichal',
+        'Beideth Briceño',
+        'Dennis Parker',
+      ];
+
+      // Erika Kudry y German Marcano sí ven el almuerzo
+      final profesoresConAlmuerzo = ['Erika Kudry', 'German Marcano'];
+
+      final esProfesorEspecial = profesoresSinDiaLibre.contains(
+        _profesorSeleccionado,
+      );
+      final esProfesorConAlmuerzo = profesoresConAlmuerzo.contains(
+        _profesorSeleccionado,
+      );
+
       filtrado = filtrado.where((clase) {
         final prof = clase['Profesor']?.toString().trim() ?? '';
-        return prof == _profesorSeleccionado || prof == 'Todos lo profesores';
+        final pianista = clase['Pianista']?.toString().trim() ?? '';
+        final tipoActividad = clase['Tipo Actividad']?.toString().trim() ?? '';
+        final esActividadGeneral =
+            tipoActividad.toLowerCase().contains('almuerzo') ||
+            tipoActividad.toLowerCase().contains('reunión') ||
+            tipoActividad.toLowerCase().contains('bienvenida');
+
+        // Filtrar por profesor o por pianista
+        final coincideProfesor =
+            prof == _profesorSeleccionado || pianista == _profesorSeleccionado;
+
+        // Para profesores especiales: solo mostrar actividades donde participen
+        // No mostrar actividades generales si no participan
+        if (esProfesorEspecial) {
+          return coincideProfesor;
+        }
+
+        // Para profesores con almuerzo: mostrar sus actividades + almuerzo
+        if (esProfesorConAlmuerzo) {
+          return coincideProfesor || prof == 'Todos lo profesores';
+        }
+
+        // Para otros profesores: mostrar sus actividades + generales
+        return coincideProfesor || prof == 'Todos lo profesores';
       }).toList();
     }
 
-    // Luego filtrar por Día seleccionado
+    // --- FILTRO POR DÍA SELECCIONADO ---
     final calendarioFiltrado = filtrado.where((clase) {
       final diaRaw = clase['Dia']?.toString() ?? '';
       return diaRaw == _diaSeleccionado;
     }).toList();
+
+    // ==========================================================
+    // REGLA 2: Detectar si profesor especial no tiene actividad hoy
+    // ==========================================================
+    // Si es un profesor especial y no hay actividades filtradas,
+    // mostrar mensaje "Sin actividad programada"
+    // Nota: Erika Kudry y German Marcano no aplican (siempre ven almuerzo)
+    final profesoresSinDiaLibre = [
+      'Elizabeth Marichal',
+      'Beideth Briceño',
+      'Dennis Parker',
+    ];
+    final esProfesorEspecial =
+        _profesorSeleccionado != null &&
+        profesoresSinDiaLibre.contains(_profesorSeleccionado);
+    final profesorSinActividadHoy =
+        esProfesorEspecial && calendarioFiltrado.isEmpty;
 
     final bloquesHorarios = _agruparPorDiaYHora(calendarioFiltrado);
 
@@ -556,9 +631,22 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
             backgroundColor: Theme.of(context).cardColor,
             child: bloquesHorarios.isEmpty
                 ? Center(
-                    child: Text(
-                      'No hay actividades programadas',
-                      style: TextStyle(color: Colors.grey.shade600),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.event_busy,
+                          size: 48,
+                          color: Colors.grey.shade700,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          profesorSinActividadHoy
+                              ? 'Sin actividad programada'
+                              : 'No hay actividades programadas',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ],
                     ),
                   )
                 : ListView.builder(
@@ -1244,7 +1332,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                                     : (clase['Tipo Actividad'] ?? 'Actividad'),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 17,
+                                  fontSize: 16,
                                 ),
                               ),
                               if (esClase &&
@@ -1253,7 +1341,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                                   clase['Tipo Actividad'],
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                   ),
                                 ),
                               ] else if (!esClase &&
@@ -1262,7 +1350,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                                   'Todos los participantes',
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
-                                    fontSize: 14,
+                                    fontSize: 13,
                                   ),
                                 ),
                               ],
@@ -1277,10 +1365,16 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                             ],
                           ),
                         ),
+                        // =================================================
+                        // COLUMNA DERECHA: PROFESOR / PIANISTA / ESPACIO
+                        // =================================================
+                        // Muestra la info del profesor, pianista (si existe)
+                        // y espacio/aula (si existe) de cada actividad
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            // --- ETIQUETA: PROFESOR ---
                             if (clase['Profesor']
                                     ?.toString()
                                     .trim()
@@ -1304,11 +1398,9 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                                 ),
                               ),
                             ],
-                            if (clase['Pianista']
-                                    ?.toString()
-                                    .trim()
-                                    .isNotEmpty ==
-                                true) ...[
+                            // --- ETIQUETA: PIANISTA (si existe) ---
+                            if ((clase['Pianista']?.toString().trim() ?? '')
+                                .isNotEmpty) ...[
                               if (clase['Profesor']
                                       ?.toString()
                                       .trim()
@@ -1333,6 +1425,7 @@ class _CalendarioScreenState extends State<CalendarioScreen> {
                                 ),
                               ),
                             ],
+                            // --- ETIQUETA: ESPACIO (si existe) ---
                             if (clase['Espacio']
                                     ?.toString()
                                     .trim()
